@@ -1,0 +1,29 @@
+.board {
+    position: relative;
+}
+
+.board-row {
+    line-height: 0;
+}
+
+.board-row.row-1 {
+    border-bottom: 1px solid white;
+}
+
+.board-row > * {
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+}
+    
+.board-block-0 { background-color: gray; }
+.board-block-1 { background-color: blue; }
+.board-block-2 { background-color: green; }
+.board-block-3 { background-color: red; }
+.board-block-4 { background-color: yellow; }
+.board-block-5 { background-color: orange; }
+.board-block-6 { background-color: brown; }
+
+.piece .piece-block {
+    position: absolute;
+}
