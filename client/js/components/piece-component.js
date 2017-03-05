@@ -64,12 +64,13 @@ class PieceComponent extends Component {
         let { centerPoint, points } = this.state
         let gridPoints
         
-        gridPoints = points.map(p => 
-            math.add(centerPoint, math.matrix([p]))._data)
+        gridPoints = points.map(p => math.add(centerPoint, math.matrix([p])))
         
-        console.log(gridPoints)
+        console.log("points", points)
+        console.log("centerPoint", centerPoint)
+        console.log("gridPoints", gridPoints)
         
-        return gridPoints.map(p => {
+        return gridPoints._data.map(p => {
             let pieceBlockClassName = "piece-block board-block-" + type
             return (
                 <div 
