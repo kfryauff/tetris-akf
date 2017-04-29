@@ -1,21 +1,22 @@
 .board {
-    position: relative;
+  position: relative;
+  display: inline-block;
 }
 
 .board-row {
-    line-height: 0;
+  line-height: 0;
 }
 
 .board-row.row-1 {
-    border-bottom: 1px solid white;
+  border-bottom: 1px solid white;
 }
 
-.board-row > * {
-    display: inline-block;
-    height: 15px;
-    width: 15px;
+.board-row > *, .piece-block {
+  display: inline-block;
+  height: 15px;
+  width: 15px;
 }
-    
+
 .board-block-0 { background-color: gray; }
 .board-block-1 { background-color: blue; }
 .board-block-2 { background-color: green; }
@@ -23,7 +24,12 @@
 .board-block-4 { background-color: yellow; }
 .board-block-5 { background-color: orange; }
 .board-block-6 { background-color: brown; }
+.board-block-7 { background-color: cyan; }
+
+.piece {
+  z-index: 100;
+}
 
 .piece .piece-block {
-    position: absolute;
+  position: absolute;
 }

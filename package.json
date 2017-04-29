@@ -9,6 +9,8 @@
     "async": "~0.2.8",
     "express": "~3.2.4",
     "mathjs": "^3.9.3",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
     "socket.io": "~0.9.14"
   },
   "devDependencies": {
