@@ -9546,6 +9546,10 @@ var _react = __webpack_require__(25);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _constants = __webpack_require__(181);
+
+var _constants2 = _interopRequireDefault(_constants);
+
 var _pieceComponent = __webpack_require__(83);
 
 var _pieceComponent2 = _interopRequireDefault(_pieceComponent);
@@ -9559,6 +9563,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var NUM_PIECES = 7;
+var TOP_BAR_POSITION = 2;
+var BOARD_ROW_COUNT = 22;
 
 var BoardComponent = function (_Component) {
   _inherits(BoardComponent, _Component);
@@ -9578,9 +9584,9 @@ var BoardComponent = function (_Component) {
     boardConstraints = {
       left: 0,
       right: board[0].length,
-      top: 2,
-      bottom: Array.apply(null, Array(22)).map(function () {
-        return 22;
+      top: TOP_BAR_POSITION,
+      bottom: Array.apply(null, Array(BOARD_ROW_COUNT)).map(function () {
+        return BOARD_ROW_COUNT;
       })
     };
 
@@ -9593,6 +9599,23 @@ var BoardComponent = function (_Component) {
    ***********/
 
   _createClass(BoardComponent, [{
+    key: 'tryMovePiece',
+    value: function tryMovePiece(gridPoints) {
+      var _this2 = this;
+
+      var pieceStates = _constants2.default.pieceStates;
+
+      var validMove = pieceStates.VALID_POSITION;
+
+      gridPoints.forEach(function (gridPoint) {
+        if (_this2.isOverflowLeft(gridPoint) || _this2.isOverflowRight(gridPoint) || _this2.isOverflowBottom(gridPoint)) {
+          validMove = pieceStates.INVALID_POSITION;
+        }
+      });
+
+      return validMove;
+    }
+  }, {
     key: 'placePiece',
     value: function placePiece(piece) {
       var _state = this.state,
@@ -9612,16 +9635,31 @@ var BoardComponent = function (_Component) {
   }, {
     key: 'getNewBoard',
     value: function getNewBoard() {
-      var _this2 = this;
+      var _this3 = this;
 
-      return Array.apply(null, Array(22)).map(function () {
-        return _this2.new_row;
+      return Array.apply(null, Array(BOARD_ROW_COUNT)).map(function () {
+        return _this3.new_row;
       });
     }
   }, {
     key: 'getRandomePiece',
     value: function getRandomePiece() {
       return Math.ceil(Math.random() * (NUM_PIECES - 1)) + 1;
+    }
+  }, {
+    key: 'isOverflowLeft',
+    value: function isOverflowLeft(point) {
+      return point[0] < this.state.boardConstraints.left;
+    }
+  }, {
+    key: 'isOverflowRight',
+    value: function isOverflowRight(point) {
+      return point[0] >= this.state.boardConstraints.right;
+    }
+  }, {
+    key: 'isOverflowBottom',
+    value: function isOverflowBottom(point) {
+      return point[1] >= this.state.boardConstraints.bottom[point[0]];
     }
 
     /**************
@@ -9664,7 +9702,8 @@ var BoardComponent = function (_Component) {
           type: this.state.activePiece,
           startCenterPoint: [4, 1],
           boardConstraints: this.state.boardConstraints,
-          placePiece: this.placePiece
+          placePiece: this.placePiece,
+          tryMovePiece: this.tryMovePiece.bind(this)
         })
       );
     }
@@ -9691,6 +9730,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _react = __webpack_require__(25);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _constants = __webpack_require__(181);
+
+var _constants2 = _interopRequireDefault(_constants);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9719,126 +9762,16 @@ var PieceComponent = function (_Component) {
     return _this;
   }
 
+  /***********
+   * Getters *
+   ***********/
+
   _createClass(PieceComponent, [{
-    key: "hasHitBottom",
-    value: function hasHitBottom() {
-      var points = this.state.points;
-
-
-      console.log("hasHitBottom");
-      // points.each(p => {
-      //   if (p[])
-      // })
-
-    }
-  }, {
-    key: "isValidMove",
-    value: function isValidMove(points, centerPoint) {
-      var _this2 = this;
-
-      var gridPoints = this.getGridPoints(points, centerPoint);
-      var validMove = true;
-
-      gridPoints.forEach(function (gridPoint) {
-        if (_this2.isOverflowLeft(gridPoint) || _this2.isOverflowRight(gridPoint) || _this2.isOverflowBottom(gridPoint)) {
-          console.log("left?", _this2.isOverflowLeft(gridPoint));
-          console.log("right?", _this2.isOverflowRight(gridPoint));
-          console.log("bottom?", _this2.isOverflowBottom(gridPoint));
-          validMove = false;
-        }
-      });
-
-      console.log("valid?", validMove);
-
-      return validMove;
-    }
-  }, {
-    key: "isOverflowLeft",
-    value: function isOverflowLeft(point) {
-      return point[0] < this.props.boardConstraints.left;
-    }
-  }, {
-    key: "isOverflowRight",
-    value: function isOverflowRight(point) {
-      return point[0] >= this.props.boardConstraints.right;
-    }
-  }, {
-    key: "isOverflowBottom",
-    value: function isOverflowBottom(point) {
-      console.log(this.props.boardConstraints.bottom);
-      return point[1] >= this.props.boardConstraints.bottom[point[0]];
-    }
-
-    /***********
-     * Actions *
-     ***********/
-
-  }, {
-    key: "movePiece",
-    value: function movePiece() {
-      var deltaX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var deltaY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var _state = this.state,
-          points = _state.points,
-          centerPoint = _state.centerPoint;
-
-      centerPoint = [centerPoint[0] + deltaX, centerPoint[1] + deltaY];
-      if (this.isValidMove(points, centerPoint)) this.setState({ centerPoint: centerPoint });
-    }
-  }, {
-    key: "rotatePiece",
-    value: function rotatePiece() {
-      // rotate piece to the right 90 degrees
-      var _state2 = this.state,
-          points = _state2.points,
-          centerPoint = _state2.centerPoint;
-
-
-      points = points.map(function (p) {
-        return [-p[1], p[0]];
-      });
-      // gridPoints = this.getGridPoints(points, centerPoint)
-      // if (gridPoints[0] > )
-
-      if (this.isValidMove(points, centerPoint)) this.setState({ points: points });
-    }
-  }, {
-    key: "dropPiece",
-    value: function dropPiece() {}
-  }, {
-    key: "maybePlacePiece",
-    value: function maybePlacePiece() {}
-  }, {
-    key: "clearTimer",
-    value: function clearTimer() {
-      clearInterval(this.timerID);
-    }
-  }, {
-    key: "setTimer",
-    value: function setTimer() {
-      var _this3 = this;
-
-      this.timerID = setInterval(function () {
-        return _this3.handleTick();
-      }, this.state.pauseInterval);
-    }
-  }, {
-    key: "resetTimerID",
-    value: function resetTimerID() {
-      this.clearTimer();
-      this.setTimer();
-    }
-
-    /***********
-     * Getters *
-     ***********/
-
-  }, {
-    key: "getPiece",
+    key: 'getPiece',
     value: function getPiece() {
       var type = this.props.type;
 
-      var points = []; // points [ [x1, y1], [x2, y2], [x3, y3] ]
+      var points = []; // points [ [x1, y1], [x2, y2], [x3, y3], [x4, y4] ]
 
       switch (type) {
         case 1:
@@ -9876,11 +9809,81 @@ var PieceComponent = function (_Component) {
       return points;
     }
   }, {
-    key: "getGridPoints",
+    key: 'getGridPoints',
     value: function getGridPoints(points, centerPoint) {
       return points.map(function (p) {
         return [p[0] + centerPoint[0], centerPoint[1] - p[1]];
       });
+    }
+
+    /***********
+     * Actions *
+     ***********/
+
+    /** Piece Actions **/
+
+  }, {
+    key: 'maybePlacePiece',
+    value: function maybePlacePiece(points, centerPoint) {
+      var tryMovePiece = this.props.tryMovePiece;
+      var pieceStates = _constants2.default.pieceStates;
+
+      var gridPoints = this.getGridPoints(points, centerPoint);
+
+      if (tryMovePiece(gridPoints) !== pieceStates.INVALID_POSITION) this.setState({ points: points, centerPoint: centerPoint });
+    }
+  }, {
+    key: 'movePiece',
+    value: function movePiece() {
+      var deltaX = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var deltaY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var _state = this.state,
+          points = _state.points,
+          centerPoint = _state.centerPoint;
+
+
+      centerPoint = [centerPoint[0] + deltaX, centerPoint[1] + deltaY];
+      this.maybePlacePiece(points, centerPoint);
+    }
+
+    // rotates piece to the right 90 degrees
+
+  }, {
+    key: 'rotatePiece',
+    value: function rotatePiece() {
+      var _state2 = this.state,
+          points = _state2.points,
+          centerPoint = _state2.centerPoint;
+
+
+      points = points.map(function (p) {
+        return [-p[1], p[0]];
+      });
+
+      this.maybePlacePiece(points, centerPoint);
+    }
+
+    /** Timer Actions **/
+
+  }, {
+    key: 'clearTimer',
+    value: function clearTimer() {
+      clearInterval(this.timerID);
+    }
+  }, {
+    key: 'setTimer',
+    value: function setTimer() {
+      var _this2 = this;
+
+      this.timerID = setInterval(function () {
+        return _this2.handleTick();
+      }, this.state.pauseInterval);
+    }
+  }, {
+    key: 'resetTimerID',
+    value: function resetTimerID() {
+      this.clearTimer();
+      this.setTimer();
     }
 
     /************
@@ -9888,17 +9891,15 @@ var PieceComponent = function (_Component) {
      ************/
 
   }, {
-    key: "handleTick",
+    key: 'handleTick',
     value: function handleTick() {
       if (!this.state.paused) {
         this.movePiece(0, 1);
-        this.maybePlacePiece();
       }
     }
   }, {
-    key: "handleKeyDown",
+    key: 'handleKeyDown',
     value: function handleKeyDown(e) {
-      console.log(e);
       if (e.which === 80) {
         // P (pause)
         e.preventDefault();
@@ -9934,7 +9935,7 @@ var PieceComponent = function (_Component) {
      **************/
 
   }, {
-    key: "formatPiece",
+    key: 'formatPiece',
     value: function formatPiece() {
       var type = this.props.type;
       var _state3 = this.state,
@@ -9945,7 +9946,7 @@ var PieceComponent = function (_Component) {
 
       return gridPoints.map(function (gp, i) {
         var pieceBlockClassName = "piece-block board-block-" + type;
-        return _react2.default.createElement("div", {
+        return _react2.default.createElement('div', {
           key: i,
           className: pieceBlockClassName,
           style: { top: gp[1] * BLOCK_SIZE, left: gp[0] * BLOCK_SIZE }
@@ -9958,23 +9959,23 @@ var PieceComponent = function (_Component) {
      ***********************/
 
   }, {
-    key: "componentDidMount",
+    key: 'componentDidMount',
     value: function componentDidMount() {
       this.setTimer();
 
       $(document).keydown(this.handleKeyDown.bind(this));
     }
   }, {
-    key: "componentWillUnmount",
+    key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       clearInterval(this.timerID);
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       return _react2.default.createElement(
-        "div",
-        { className: "piece" },
+        'div',
+        { className: 'piece' },
         this.formatPiece()
       );
     }
@@ -22274,6 +22275,22 @@ var App = function App() {
 }; /*global import export */
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('root'));
+
+/***/ }),
+/* 181 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var constants = {
+  pieceStates: { INVALID_POSITION: -1, VALID_POSITION: 0, PLACED: 1 }
+};
+
+exports.default = constants;
 
 /***/ })
 /******/ ]);

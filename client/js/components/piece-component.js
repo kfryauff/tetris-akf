@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import constants from '../util/constants'
 
 const BLOCK_SIZE = 15
 class PieceComponent extends Component {
@@ -14,102 +15,13 @@ class PieceComponent extends Component {
       }
   }
 
-  hasHitBottom() {
-    let { points } = this.state
-
-    console.log("hasHitBottom")
-    // points.each(p => {
-    //   if (p[])
-    // })
-
-
-  }
-
-  isValidMove(points, centerPoint) {
-    let gridPoints = this.getGridPoints(points, centerPoint)
-    let validMove = true
-
-    gridPoints.forEach(gridPoint => {
-      if (this.isOverflowLeft(gridPoint) ||
-          this.isOverflowRight(gridPoint) ||
-          this.isOverflowBottom(gridPoint)) {
-            console.log("left?", this.isOverflowLeft(gridPoint))
-            console.log("right?", this.isOverflowRight(gridPoint))
-            console.log("bottom?", this.isOverflowBottom(gridPoint))
-        validMove = false
-      }
-    })
-
-    console.log("valid?", validMove)
-
-    return validMove
-  }
-
-  isOverflowLeft(point) {
-    return (point[0] < this.props.boardConstraints.left)
-  }
-
-  isOverflowRight(point) {
-    return (point[0] >= this.props.boardConstraints.right)
-  }
-
-  isOverflowBottom(point) {
-    console.log(this.props.boardConstraints.bottom)
-    return (point[1] >= this.props.boardConstraints.bottom[point[0]])
-  }
-
-  /***********
-   * Actions *
-   ***********/
-
-  movePiece(deltaX = 0, deltaY = 0) {
-    let { points, centerPoint } = this.state
-    centerPoint = [centerPoint[0] + deltaX, centerPoint[1] + deltaY]
-    if (this.isValidMove(points, centerPoint)) this.setState({ centerPoint })
-  }
-
-  rotatePiece() {
-    // rotate piece to the right 90 degrees
-    let { points, centerPoint } = this.state
-
-    points = points.map(p => [-p[1], p[0]])
-    // gridPoints = this.getGridPoints(points, centerPoint)
-    // if (gridPoints[0] > )
-
-    if (this.isValidMove(points, centerPoint)) this.setState({ points })
-  }
-
-  dropPiece() {
-
-  }
-
-  maybePlacePiece() {
-
-  }
-
-  clearTimer() {
-    clearInterval(this.timerID)
-  }
-
-  setTimer() {
-    this.timerID = setInterval(
-      () => this.handleTick(),
-      this.state.pauseInterval,
-    );
-  }
-
-  resetTimerID() {
-    this.clearTimer()
-    this.setTimer()
-  }
-
   /***********
    * Getters *
    ***********/
 
   getPiece() {
       let { type } = this.props
-      let points = [] // points [ [x1, y1], [x2, y2], [x3, y3] ]
+      let points = [] // points [ [x1, y1], [x2, y2], [x3, y3], [x4, y4] ]
 
       switch(type) {
           case 1: // I block
@@ -144,6 +56,56 @@ class PieceComponent extends Component {
     return points.map(p => [p[0] + centerPoint[0], centerPoint[1] - p[1]])
   }
 
+  /***********
+   * Actions *
+   ***********/
+
+  /** Piece Actions **/
+
+  maybePlacePiece(points, centerPoint) {
+    let { tryMovePiece } = this.props
+    let { pieceStates } = constants
+    let gridPoints = this.getGridPoints(points, centerPoint)
+
+    if (tryMovePiece(gridPoints) !== pieceStates.INVALID_POSITION)
+      this.setState({ points, centerPoint })
+  }
+
+  movePiece(deltaX = 0, deltaY = 0) {
+    let { points, centerPoint } = this.state
+
+    centerPoint = [centerPoint[0] + deltaX, centerPoint[1] + deltaY]
+    this.maybePlacePiece(points, centerPoint)
+
+  }
+
+  // rotates piece to the right 90 degrees
+  rotatePiece() {
+    let { points, centerPoint } = this.state
+
+    points = points.map(p => [-p[1], p[0]])
+
+    this.maybePlacePiece(points, centerPoint)
+  }
+
+  /** Timer Actions **/
+
+  clearTimer() {
+    clearInterval(this.timerID)
+  }
+
+  setTimer() {
+    this.timerID = setInterval(
+      () => this.handleTick(),
+      this.state.pauseInterval,
+    );
+  }
+
+  resetTimerID() {
+    this.clearTimer()
+    this.setTimer()
+  }
+
   /************
    * Handlers *
    ************/
@@ -151,12 +113,10 @@ class PieceComponent extends Component {
   handleTick() {
     if (!this.state.paused) {
       this.movePiece(0, 1)
-      this.maybePlacePiece()
     }
   }
 
   handleKeyDown(e) {
-    console.log(e)
     if (e.which === 80) {  // P (pause)
       e.preventDefault()
       // this.state.pause ? this.setTimer() : this.clearTimer()
