@@ -9987,6 +9987,7 @@ var PieceComponent = function (_Component) {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       clearInterval(this.timerID);
+      $(document).keydown = null;
     }
   }, {
     key: 'render',

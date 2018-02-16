@@ -174,6 +174,7 @@ class PieceComponent extends Component {
 
   componentWillUnmount() {
     clearInterval(this.timerID)
+    $(document).keydown = null
   }
 
   render() {
